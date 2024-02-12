@@ -1,5 +1,92 @@
-program readFile
+program startProgram
     implicit none
+
+    logical :: exit_program
+
+    exit_program = .false.
+    do while (.not. exit_program)
+        call initial_menu(exit_program)
+    end do
+
+end program startProgram
+
+subroutine initial_menu(exit_program)
+    implicit none
+    logical, intent(out) :: exit_program
+    integer :: option
+
+    do
+        call print_menu()
+        read(*, *) option
+
+        select case(option)
+        case(1)
+            call parametros_iniciales()
+        ! case(2)
+        !     call carga_masiva_clientes()
+        ! case(3)
+        !     call cantidad_ventanillas()
+        ! case(4)
+        !     call ejecutar_paso()
+        ! case(5)
+        !     call estado_memoria_estructuras()
+        case(6)
+            exit_program = .true.
+            exit
+        case default
+            print *, "Error!. Por favor seleccione una opcion valida."
+        end select
+    end do
+
+end subroutine initial_menu
+
+subroutine print_menu()
+    print *, "...................................."
+    print *, "         Menu Principal             "
+    print *, "...................................."
+    print *, "1. Parametros iniciales"
+    print *, "2. Ejecutar paso"
+    print *, "3. Estado en memoria de las estructuras"
+    print *, "4. Reportes"
+    print *, "5. Acerca de "
+    print *, "6. Salir"
+    print *, "...................................."
+    print *, "Ingrese el numero de la opcion deseada:"
+end subroutine print_menu
+
+subroutine parametros_iniciales()
+    integer :: option
+    do
+        call parameters_menu()
+        read(*, *) option
+
+        select case(option)
+        case(1)
+            call readFile()
+        case(2)
+            call windowNumber()
+        case(3)
+            exit
+        case default
+            print *, "Error!. Por favor seleccione una opcion valida."
+        end select
+    end do
+end subroutine parametros_iniciales
+
+
+subroutine parameters_menu()
+    print *, "...................................."
+    print *, "         Seleccione una opcion            "
+    print *, "...................................."
+    print *, "1. Carga masiva de clientes"
+    print *, "2. Cantidad de ventanillas"
+    print *, "3. Regresar a menu principal"
+end subroutine parameters_menu
+
+
+
+subroutine readFile()
+    
     character(len=256) :: filename
     integer :: file_unit, status
     logical :: in_array, in_object
@@ -11,11 +98,9 @@ program readFile
 
     open(unit = file_unit, file = trim(filename) // '.json', action='READ')
     
-    ! Variables para el análisis del JSON
     in_array = .false.
     in_object = .false.
 
-    ! Leer el contenido línea por línea
     do
         read(file_unit, '(A)', iostat=status) line
         if (status /= 0) exit
@@ -48,4 +133,18 @@ program readFile
         endif
     end do
     close(file_unit)
-end program readFile
+end subroutine readFile
+
+
+subroutine windowNumber()
+    integer :: windowsAmount
+    character(len=1) :: dummy_char
+
+    print *, ">> Ingrese el número de ventanillas disponibles:"
+    read(*, *) windowsAmount
+
+    print *, ">> Ventanillas creadas exitosamente!"
+    print *, ">> ...........................................!"
+    print *, "Presione cualquier tecla para volver al menu..."
+    read(*,*) dummy_char  
+end subroutine windowNumber
