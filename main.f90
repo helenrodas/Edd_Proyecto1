@@ -1,5 +1,6 @@
 program startProgram
     implicit none
+    
 
     logical :: exit_program
 
@@ -135,16 +136,30 @@ subroutine readFile()
     close(file_unit)
 end subroutine readFile
 
-
 subroutine windowNumber()
-    integer :: windowsAmount
-    character(len=1) :: dummy_char
+    use linkedlist
+        implicit none
+        
+        type(linked_list) :: windowsList
+        integer :: windowsAmount, i
+        character(len=1) :: dummy_char
 
-    print *, ">> Ingrese el número de ventanillas disponibles:"
-    read(*, *) windowsAmount
+        print *, ">> Ingrese el numero de ventanillas disponibles:"
+        read(*, *) windowsAmount
 
-    print *, ">> Ventanillas creadas exitosamente!"
-    print *, ">> ...........................................!"
-    print *, "Presione cualquier tecla para volver al menu..."
-    read(*,*) dummy_char  
+        ! Inicializar la lista de ventanillas
+        call init_linked_list(windowsList)
+
+        ! Agregar nodos a la lista para representar las ventanillas
+        do i = 1, windowsAmount
+            call push(windowsList, i)
+        end do
+
+        ! Mostrar las ventanillas creadas
+        print *, "Ventanillas creadas exitosamente:"
+        call print(windowsList)
+
+        ! Esperar a que el usuario presione cualquier tecla antes de volver al menú
+        print *, "Presione cualquier tecla para volver al menu..."
+        read(*,*) dummy_char
 end subroutine windowNumber
