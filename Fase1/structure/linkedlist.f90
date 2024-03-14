@@ -18,24 +18,33 @@ module linkedList
     contains
 
     subroutine push(self, value)
-    class(linked_list), intent(inout) :: self
-    integer, intent(in) :: value
-
-    type(node), pointer :: newNode
-    allocate(newNode)
-
-    newNode%value = value
-    newNode%next => null()
-
-    if (.not. associated(self%head)) then
-        self%head => newNode
-    else
-        newNode%next => self%head
-        self%head => newNode
-    end if
-
-    print *, 'pushed:: ', value
+        class(linked_list), intent(inout) :: self
+        integer, intent(in) :: value
+    
+        type(node), pointer :: current, newNode
+    
+        ! Crear un nuevo nodo
+        allocate(newNode)
+        newNode%value = value
+        newNode%next => null()
+    
+        ! Si la lista está vacía, el nuevo nodo se convierte en la cabeza de la lista
+        if (.not. associated(self%head)) then
+            self%head => newNode
+        else
+            ! Encontrar el último nodo de la lista
+            current => self%head
+            do while (associated(current%next))
+                current => current%next
+            end do
+    
+            ! Insertar el nuevo nodo al final de la lista
+            current%next => newNode
+        end if
+    
+        print *, 'pushed:: ', value
     end subroutine push
+    
 
     subroutine delete_by_position(self, position)
     class(linked_list), intent(inout) :: self
@@ -60,7 +69,7 @@ module linkedList
     end do
 
     if (.not. associated(current)) then
-        print *, 'Position not found'
+        print *, 'No se encontro la posicion'
         return
     end if
 
@@ -69,16 +78,17 @@ module linkedList
     end subroutine delete_by_position
 
     subroutine print(self)
-    class(linked_list), intent(in) :: self
-
-    type(node), pointer :: current
-
-    current => self%head
-
-    do while (associated(current))
-        print *, current%value
-        current => current%next
-    end do
+        class(linked_list), intent(in) :: self
+    
+        type(node), pointer :: current
+    
+        current => self%head
+    
+        ! Recorre la lista y imprime los valores
+        do while (associated(current))
+            print *, current%value
+            current => current%next
+        end do
     end subroutine print
 
     subroutine init_linked_list(self)
@@ -92,5 +102,7 @@ module linkedList
         
         self%head => null()
     end subroutine init_linked_list
+
+    
 
 end module linkedList

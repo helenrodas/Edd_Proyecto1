@@ -87,12 +87,20 @@ end subroutine parameters_menu
 
 
 subroutine readFile()
+    use cola_module
+    use linkedList
+    implicit none
     
+    type(cola) :: mi_cola
+    !type (linked_list) :: lista_gente
+    integer :: id_asInt, img_p_asInt, img_g_asInt
+    character(len=50) :: name_asString
     character(len=256) :: filename
     integer :: file_unit, status
     logical :: in_array, in_object
-    character(len=50) :: id, nombre, img_g, img_p
-    character(len=1000) :: line
+    character(len=50) :: id, nombre, img_p
+    character(len=1000) :: line, field
+    integer :: comma_position, colon_position
 
     print *, ">> Ingrese el nombre del archivo JSON:"
     read(*, '(A)') filename
@@ -115,26 +123,48 @@ subroutine readFile()
             in_object = .true.
         elseif (index(line, '}') > 0) then
             in_object = .false.
-            ! Mostrar los datos del objeto
-            print *, "ID:", trim(id)
-            print *, "Nombre:", trim(nombre)
-            print *, "Imagen grande:", trim(img_g)
-            print *, "Imagen pequeña:", trim(img_p)
+            ! Agregar los datos del objeto a la cola
+        
         elseif (in_array .and. in_object) then
-            ! Buscar y extraer los campos
+            ! Encuentra la posición de la coma
+            comma_position = index(line, ',')
+            ! Encuentra la posición de los dos puntos (:) para obtener el valor después de él
+            colon_position = index(line, ':')
+            
+            ! Si hay una coma al final de la línea
+            if (comma_position > 0) then
+                ! Lee el campo hasta la coma
+                field = line(colon_position+1:comma_position-1)
+            else
+                ! Si no hay coma al final de la línea, lee el campo hasta el final de la línea
+                field = line(colon_position+1:)
+            endif
+            
+            ! Procesa el campo eliminando las comillas dobles
+            ! field = mi_cola%removeQuotes(field)
+            
+            ! Asigna el valor del campo a la variable correspondiente
             if (index(line, '"id"') > 0) then
-                id = line(index(line, ':')+1:)
+                read(field, *) id_asInt
             elseif (index(line, '"nombre"') > 0) then
-                nombre = line(index(line, ':')+1:)
+                !read(field, *) name_asString
+                nombre = field
+                !print *, nombre
             elseif (index(line, '"img_g"') > 0) then
-                img_g = line(index(line, ':')+1:)
+                read(field, *) img_g_asInt
             elseif (index(line, '"img_p"') > 0) then
-                img_p = line(index(line, ':')+1:)
+                read(field, *) img_p_asInt
+                ! Agregar los valores a la cola
+                call mi_cola%push(id_asInt, trim(nombre), img_g_asInt, img_p_asInt)
+                
             endif
         endif
     end do
+    call mi_cola%print
     close(file_unit)
-end subroutine readFile
+end subroutine readFile 
+
+
 
 subroutine windowNumber()
     use linkedlist
